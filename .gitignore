@@ -1,0 +1,10 @@
+## intellij-stuff
+.idea
+*.iml
+
+## gradlew
+.gradle
+
+## build directories
+/dist
+/build
