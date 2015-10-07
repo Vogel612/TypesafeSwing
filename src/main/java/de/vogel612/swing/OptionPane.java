@@ -1,20 +1,31 @@
 package de.vogel612.swing;
 
 import de.vogel612.swing.internal.SwingWrapperEnum;
-import de.vogel612.swing.reflection.ThinWrapper;
 
 import javax.accessibility.Accessible;
-import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.plaf.OptionPaneUI;
 import java.awt.*;
+
+import lombok.experimental.Delegate;
 
 /**
  * Created by vogel612 on 07.10.15.
  */
 @SuppressWarnings("unused")
-@ThinWrapper(field = "wrapped", type = JComponent.class)
 public class OptionPane extends JComponent implements Accessible {
+    private interface Exclusions {
+        boolean isPaintingForPrint();
+        void setInputMap(int i,InputMap m);
+        InputMap getInputMap(int i);
+        InputMap getInputMap();
+        void setActionMap(ActionMap m);
+        ActionMap getActionMap();
+        Object getClientProperty(Object o);
+        void putClientProperty(Object k, Object v);
+        void setFocusTraversalPolicyProvider(boolean b);
+        boolean isFocusTraversalPolicyProvider();
+    }
 
     public enum Choice implements SwingWrapperEnum {
         OK(JOptionPane.OK_OPTION),
@@ -234,6 +245,7 @@ public class OptionPane extends JComponent implements Accessible {
     }
 
 
+    @Delegate(types = JComponent.class, excludes = Exclusions.class)
     private final JOptionPane wrapped;
 
     public OptionPane(Object message) {
@@ -276,11 +288,6 @@ public class OptionPane extends JComponent implements Accessible {
 
     public JInternalFrame createInternalFrame(Component parent, String title) {
         return wrapped.createInternalFrame(parent, title);
-    }
-
-    @Override
-    public AccessibleContext getAccessibleContext() {
-        return wrapped.getAccessibleContext();
     }
 
     public static JDesktopPane getDesktopPaneForComponent(Component parent) {
@@ -337,11 +344,6 @@ public class OptionPane extends JComponent implements Accessible {
 
     public OptionPaneUI getUI() {
         return wrapped.getUI();
-    }
-
-    @Override
-    public String getUIClassID() {
-        return wrapped.getUIClassID();
     }
 
     public Object getValue() {
@@ -407,11 +409,4 @@ public class OptionPane extends JComponent implements Accessible {
     public void setWantsInput(boolean newValue) {
         wrapped.setWantsInput(newValue);
     }
-
-    @Override
-    public void updateUI() {
-        wrapped.updateUI();
-    }
-
-    // FIXME delegate extended methods to wrapped object
 }
